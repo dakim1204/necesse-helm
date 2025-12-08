@@ -2,6 +2,7 @@
 import re
 import sys
 from pathlib import Path
+from datetime import datetime, timezone
 
 import requests
 import yaml
@@ -15,7 +16,25 @@ def fetch_tags():
     resp = requests.get(DOCKER_TAGS_API, timeout=30)
     resp.raise_for_status()
     data = resp.json()
-    return [r["name"] for r in data.get("results", [])]
+    results = data.get("results", [])
+    tags = []
+    for r in results:
+        name = r.get("name")
+        last_updated_str = r.get("last_updated") or r.get("tag_last_pushed")
+        try:
+            last_updated = datetime.fromisoformat(
+                last_updated_str.replace("Z", "+00:00")
+            )
+        except Exception:
+            last_updated = datetime(1970, 1, 1, tzinfo=timezone.utc)
+
+        tags.append(
+            {
+                "name": name,
+                "last_updated": last_updated,
+            }
+        )
+    return tags
 
 
 def parse_version(tag: str):
@@ -27,23 +46,49 @@ def parse_version(tag: str):
     build_str = m.group(2)
     major, minor, patch = map(int, base.split("-"))
     build = int(build_str) if build_str is not None else 0
-    return (major, minor, patch, build, base, tag)
+    # (major, minor, patch, build, base, full_tag)
+    return major, minor, patch, build, base, tag
 
 
-def select_latest_tag(tags):
+def select_latest_tag(tag_records):
     parsed = []
-    for t in tags:
-        v = parse_version(t)
-        if v:
-            parsed.append(v)
+    for rec in tag_records:
+        name = rec["name"]
+        last_updated = rec["last_updated"]
+        v = parse_version(name)
+        if not v:
+            continue
+        major, minor, patch, build, base, full_tag = v
+        parsed.append(
+            {
+                "name": full_tag,
+                "base": base,
+                "major": major,
+                "minor": minor,
+                "patch": patch,
+                "build": build,
+                "last_updated": last_updated,
+            }
+        )
 
     if not parsed:
         raise RuntimeError("No parsable Necesse tags found from Docker Hub")
 
-    parsed.sort()
-    latest = parsed[-1]
-    major, minor, patch, build, base, full_tag = latest
-    return base, full_tag
+    parsed.sort(key=lambda x: x["last_updated"])
+    latest_time = parsed[-1]["last_updated"]
+
+    latest_candidates = [
+        p for p in parsed if p["last_updated"] == latest_time
+    ]
+
+    latest_candidates.sort(
+        key=lambda x: (x["major"], x["minor"], x["patch"], x["build"])
+    )
+    chosen = latest_candidates[-1]
+
+    base_version = chosen["base"]
+    full_tag = chosen["name"]
+    return base_version, full_tag
 
 
 def update_yaml_file(path: Path, field_path, new_value):
@@ -65,11 +110,11 @@ def update_yaml_file(path: Path, field_path, new_value):
 
 def main():
     print("Fetching tags from Docker Hub...")
-    tags = fetch_tags()
-    base_version, full_tag = select_latest_tag(tags)
+    tag_records = fetch_tags()
+    base_version, full_tag = select_latest_tag(tag_records)
 
-    print(f"Latest Necesse version (base): {base_version}")
-    print(f"Latest Docker tag: {full_tag}")
+    print(f"Latest Necesse base version (by date): {base_version}")
+    print(f"Latest Docker tag (by date + version): {full_tag}")
 
     chart_path = Path("Chart.yaml")
     values_path = Path("values.yaml")
@@ -78,11 +123,9 @@ def main():
         print("Chart.yaml or values.yaml not found in current directory", file=sys.stderr)
         sys.exit(1)
 
-    # Chart.yaml: appVersion update
     old_app, new_app = update_yaml_file(chart_path, ("appVersion",), base_version)
     print(f"Chart.yaml: appVersion {old_app!r} -> {new_app!r}")
 
-    # values.yaml: image.tag update
     old_tag, new_tag = update_yaml_file(values_path, ("image", "tag"), full_tag)
     print(f"values.yaml: image.tag {old_tag!r} -> {new_tag!r}")
 
@@ -94,4 +137,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -8,7 +8,7 @@ replicaCount: 1
 image:
   registry: docker.io
   repository: brammys/necesse-server
-  tag: 1-0-20422048
+  tag: 1-0-3
   pullPolicy: IfNotPresent
   pullSecrets: []
   debug: false
