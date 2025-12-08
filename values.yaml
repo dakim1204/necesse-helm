@@ -1,0 +1,131 @@
+## @section Global parameters
+global:
+  ## @param global.imageRegistry Global Docker image registry
+  imageRegistry: ""
+  ## @param global.imagePullSecrets Global Docker registry secret names as an array
+  imagePullSecrets: []
+  ## @param global.storageClass Global StorageClass for dynamic provisioning
+  storageClass: ""
+
+## @section Common parameters
+## @param nameOverride String to partially override necesse-server.fullname
+nameOverride: ""
+## @param fullnameOverride String to fully override necesse-server.fullname
+fullnameOverride: ""
+
+## @param replicaCount Number of necesse-server replicas
+replicaCount: 1
+
+## @section Image parameters
+image:
+  ## @param image.registry Docker registry
+  registry: docker.io
+  ## @param image.repository Docker image repository
+  repository: brammys/necesse-server
+  ## @param image.tag Docker image tag
+  tag: "1.0.3"
+  ## @param image.pullPolicy Docker image pull policy
+  pullPolicy: IfNotPresent
+  ## @param image.pullSecrets Docker registry secret names as an array
+  pullSecrets: []
+  ## @param image.debug Enable extra debug logging
+  debug: false
+
+## @section Necesse specific parameters
+necesse:
+  ## @param necesse.world Name of the world (maps to WORLD env)
+  world: "world"
+  ## @param necesse.password Server password (maps to PASSWORD env, empty for no password)
+  password: ""
+  ## @param necesse.slots Number of player slots (maps to SLOTS env)
+  slots: 10
+  ## @param necesse.owner Owner name with admin permissions (maps to OWNER env)
+  owner: ""
+  ## @param necesse.motd Message of the day (maps to MOTD env)
+  motd: "This server is made possible by Helm!"
+  ## @param necesse.giveClientsPower Anti-cheat smoothing (0/1, maps to GIVE_CLIENTS_POWER env)
+  giveClientsPower: 1
+  ## @param necesse.pause Pause server when empty (0/1, maps to PAUSE env)
+  pause: 0
+  ## @param necesse.logging Enable log file generation (0/1, maps to LOGGING env)
+  logging: 1
+  ## @param necesse.zip Compress saves (0/1, maps to ZIP env)
+  zip: 1
+  ## @param necesse.jvmArgs Extra JVM args (maps to JVMARGS env)
+  jvmArgs: ""
+
+## @section Container ports
+containerPorts:
+  ## @param containerPorts.game UDP game port
+  game: 14159
+
+## @section Service parameters
+service:
+  ## @param service.type Kubernetes Service type
+  type: LoadBalancer
+  ## @param service.annotations Service annotations
+  annotations: {}
+  ## @param service.labels Additional Service labels
+  labels: {}
+  ## @param service.loadBalancerIP LoadBalancer fixed IP
+  loadBalancerIP: ""
+  ## @param service.externalTrafficPolicy External traffic policy
+  externalTrafficPolicy: Cluster
+  ## @param service.ports.game.port Service port for game
+  ports:
+    game:
+      port: 14159
+      protocol: UDP
+
+## @section Persistence parameters
+persistence:
+  ## @param persistence.enabled Enable data persistence using PVC
+  enabled: true
+  ## @param persistence.existingClaim Use an existing PVC instead of creating one
+  existingClaim: ""
+  ## @param persistence.storageClass StorageClass for the PVC
+  storageClass: ""
+  ## @param persistence.accessModes PVC access modes
+  accessModes:
+    - ReadWriteOnce
+  ## @param persistence.size PVC size
+  size: 10Gi
+  ## @param persistence.annotations Additional annotations for the PVC
+  annotations: {}
+
+## @section Resource & probe parameters
+resources:
+  limits: {}
+  requests:
+    cpu: "500m"
+    memory: "1Gi"
+
+livenessProbe:
+  enabled: false
+
+readinessProbe:
+  enabled: false
+
+## @section Pod security & scheduling
+podSecurityContext:
+  enabled: true
+  fsGroup: 1000
+
+securityContext:
+  enabled: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+## @section Extra configuration
+extraEnv: []
+extraEnvFrom: []
+extraVolumes: []
+extraVolumeMounts: []
+podAnnotations: {}
+podLabels: {}
+

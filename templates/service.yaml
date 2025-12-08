@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "necesse-server.fullname" . }}
+  labels:
+    {{- include "necesse-server.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- if .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+  {{- end }}
+  externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy }}
+  selector:
+    {{- include "necesse-server.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: game
+      port: {{ .Values.service.ports.game.port }}
+      targetPort: {{ .Values.containerPorts.game }}
+      protocol: {{ .Values.service.ports.game.protocol }}
+

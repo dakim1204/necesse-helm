@@ -1,0 +1,11 @@
+1. Necesse server has been deployed.
+
+To get the Service details:
+
+  kubectl get svc --namespace {{ .Release.Namespace }} {{ include "necesse-server.fullname" . }}
+
+Make sure MetalLB (or your cloud LB) allows UDP traffic on port {{ .Values.service.ports.game.port }}.
+
+Clients can connect using:
+  <external-ip>:{{ .Values.service.ports.game.port }}
+
