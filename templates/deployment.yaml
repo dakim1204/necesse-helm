@@ -89,7 +89,11 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: necesse-data
-              mountPath: /necesse
+              mountPath: /necesse/saves
+              subPath: saves
+            - name: necesse-data
+              mountPath: /necesse/logs
+              subPath: logs
             {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
