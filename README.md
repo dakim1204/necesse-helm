@@ -1,5 +1,5 @@
 ## 📦 Necesse Dedicated Server Helm Chart
----
+
 This Helm chart deploys a Necesse Dedicated Server on Kubernetes, using the excellent [brammys/necesse-server](https://hub.docker.com/r/brammys/necesse-server) Docker image as its base.
 
 A scheduled GitHub Actions workflow automatically fetches the latest Docker Hub tags and updates:
@@ -10,7 +10,7 @@ A scheduled GitHub Actions workflow automatically fetches the latest Docker Hub 
 ensuring your chart always stays in sync with the latest Necesse server release.
 
 ## 🚀 Features
----
+
 - Tracks and uses the latest BrammyS Necesse Docker image
 - Automatic version updates via CI
 - LoadBalancer (UDP) Service for game connectivity
@@ -19,7 +19,7 @@ ensuring your chart always stays in sync with the latest Necesse server release.
 - Helm chart packaged and published to Harbor OCI Registry
 
 ## 🧱 Prerequisites
----
+
 - Kubernetes 1.24+
 - Helm 3.10+
 - A LoadBalancer-enabled cluster (MetalLB or cloud LB)
@@ -87,7 +87,7 @@ helm install necesse-server ./ \
 ```
 
 ## ⚙️ Configuration (values.yaml)
----
+
 Commonly used parameters:
 
 | Key                       | Description                    | Default                                     |
@@ -107,7 +107,7 @@ Commonly used parameters:
 Full configuration is available inside `values.yaml`.
 
 ## 📡 Networking
----
+
 The Necesse server exposes:
 
 | Port    | Protocol | Purpose            |
@@ -118,7 +118,7 @@ The Necesse server exposes:
 > Use LoadBalancer or NodePort (UDP-enabled) instead.
 
 💾 Persistence
----
+
 The BrammyS Docker image stores data under:
 
 ```sh
@@ -129,7 +129,7 @@ The BrammyS Docker image stores data under:
 This chart mounts a PVC at `/necesse`, ensuring world data and logs survive restarts or server upgrades.
 
 🔄 Upgrading the Server
----
+
 When the CI workflow detects a new Docker Hub release, it automatically updates:
 - Chart.yaml → appVersion
 - values.yaml → image.tag
@@ -145,5 +145,6 @@ helm upgrade necesse-server \
 ❤️ Credits
 ---
 - Docker image: [https://hub.docker.com/r/brammys/necesse-server](https://hub.docker.com/r/brammys/necesse-server)
+  
   Special thanks to BrammyS for maintaining an excellent, frequently-updated image.
 - Necesse is developed by [Fair Games ApS](https://necessegame.com/).
