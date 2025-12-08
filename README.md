@@ -32,32 +32,19 @@ ensuring your chart always stays in sync with the latest Necesse server release.
 1. Pull the default values.yaml from the chart
 
 ```sh
-helm show values oci://registry.dakim.dev/dedicated-server/necesse-server \
-  --version 1.0.0 > values.yaml
+helm show values oci://registry.dakim.dev/dedicated-server/necesse-server > values.yaml
 ```
 
-2. Create your own override file
+2. Edit what you need:
 
-Edit only what you need:
-**values.override.yaml**
+`values.yaml`
 
-```yaml
-necesse:
-  world: "MyWorld"
-  password: "mypassword"
-  slots: 10
-
-service:
-  type: LoadBalancer
-```
-
-3. Install the chart using your overrides
+3. Install the chart using your `values.yaml`
 
 ```sh
-helm install necesse-server \
-  oci://harbor.dakim.dev/dedicated-server/necesse-server \
-  --version 1.0.0 \
-  -f values.override.yaml \
+helm upgrade --install necesse-server \
+  oci://registry.dakim.dev/dedicated-server/necesse-server \
+  -f values.yaml \
 ```
 
 > The chart version (`--version`) refers to the chart,
@@ -72,18 +59,10 @@ git clone https://github.com/dakim1204/necesse-helm.git
 cd necesse-server-helm
 ```
 
-Pull default values and create your overrides:
-
-```sh
-cp values.yaml values.override.yaml
-# edit values.override.yaml as needed
-```
-
 Install from the local directory:
 
 ```sh
-helm install necesse-server ./ \
-  -f values.override.yaml \
+helm install necesse-server ./ -f values.yaml
 ```
 
 ## ⚙️ Configuration (values.yaml)
@@ -98,7 +77,7 @@ Commonly used parameters:
 | `necesse.password`        | Server password                | `""`                                        |
 | `necesse.slots`           | Max player slots               | `10`                                        |
 | `necesse.owner`           | Owner/admin name               | `""`                                        |
-| `necesse.motd`            | Message of the day             | `"This server is made possible by Docker!"` |
+| `necesse.motd`            | Message of the day             | `"This server is made possible by Helm!"`   |
 | `persistence.enabled`     | Enable persistent storage      | `true`                                      |
 | `persistence.size`        | PVC size                       | `10Gi`                                      |
 | `service.type`            | Kubernetes Service type        | `LoadBalancer`                              |
@@ -136,9 +115,8 @@ When the CI workflow detects a new Docker Hub release, it automatically updates:
 
 After the update:
 ```sh
-helm upgrade necesse-server \
+helm upgrade --install necesse-server \
   oci://harbor.dakim.dev/dedicated-server/necesse-server \
-  --version 1.0.0 \
   --reuse-values
 ```
 
