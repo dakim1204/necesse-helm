@@ -26,7 +26,7 @@ ensuring your chart always stays in sync with the latest Necesse server release.
 - UDP port 14159 reachable from clients
 
 ## 📥 Installing the Chart
----
+
 ### Option 1: Install via OCI (recommended)
 
 1. Pull the default values.yaml from the chart
