@@ -68,6 +68,6 @@ jobs:
             exit 1
           fi
 
-          echo "Pushing ${CHART_TGZ} to oci://${HARBOR_URL}/helm"
-          helm push "${CHART_TGZ}" "oci://${HARBOR_URL}/helm"
+          echo "Pushing ${CHART_TGZ} to oci://${HARBOR_URL}/dedicated-server"
+          helm push "${CHART_TGZ}" "oci://${HARBOR_URL}/dedicated-server"
 
