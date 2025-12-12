@@ -17,6 +17,7 @@ ensuring your chart always stays in sync with the latest Necesse server release.
 - Persistent storage for world files and logs
 - Clean and simple value overrides for server configuration
 - Helm chart packaged and published to Harbor OCI Registry
+- Mirror publishing to GitHub Pages for easy public consumption
 
 ## 🧱 Prerequisites
 
@@ -50,7 +51,24 @@ helm upgrade --install necesse-server \
 > The chart version (`--version`) refers to the chart,
 > while the actual game server version is managed automatically via CI (`appVersion`, `image.tag`).
 
-### Option 2: Clone the GitHub repo and install locally
+### Option 2: Add the GitHub-hosted Helm repo
+
+1. Add the repo (served via GitHub Pages):
+
+```sh
+helm repo add necesse https://dakim1204.github.io/necesse-helm
+helm repo update
+```
+
+2. Install the chart:
+
+```sh
+helm upgrade --install necesse-server \
+  necesse/necesse-server \
+  -f values.yaml
+```
+
+### Option 3: Clone the GitHub repo and install locally
 
 If you prefer to inspect or modify the chart source:
 
@@ -115,8 +133,14 @@ When the CI workflow detects a new Docker Hub release, it automatically updates:
 
 After the update:
 ```sh
+# OCI (Harbor)
 helm upgrade --install necesse-server \
   oci://harbor.dakim.dev/dedicated-server/necesse-server \
+  --reuse-values
+
+# or GitHub Pages repo
+helm upgrade --install necesse-server \
+  necesse/necesse-server \
   --reuse-values
 ```
 
