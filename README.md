@@ -28,30 +28,8 @@ ensuring your chart always stays in sync with the latest Necesse server release.
 
 ## 📥 Installing the Chart
 
-### Option 1: Install via OCI (recommended)
 
-1. Pull the default values.yaml from the chart
-
-```sh
-helm show values oci://registry.dakim.dev/dedicated-server/necesse-server > values.yaml
-```
-
-2. Edit what you need:
-
-`values.yaml`
-
-3. Install the chart using your `values.yaml`
-
-```sh
-helm upgrade --install necesse-server \
-  oci://registry.dakim.dev/dedicated-server/necesse-server \
-  -f values.yaml \
-```
-
-> The chart version (`--version`) refers to the chart,
-> while the actual game server version is managed automatically via CI (`appVersion`, `image.tag`).
-
-### Option 2: Add the GitHub-hosted Helm repo
+### Option 1: Add the GitHub-hosted Helm repo
 
 1. Add the repo (served via GitHub Pages):
 
@@ -68,7 +46,7 @@ helm upgrade --install necesse-server \
   -f values.yaml
 ```
 
-### Option 3: Clone the GitHub repo and install locally
+### Option 2: Clone the GitHub repo and install locally
 
 If you prefer to inspect or modify the chart source:
 
@@ -132,13 +110,8 @@ When the CI workflow detects a new Docker Hub release, it automatically updates:
 - values.yaml → image.tag
 
 After the update:
-```sh
-# OCI (Harbor)
-helm upgrade --install necesse-server \
-  oci://harbor.dakim.dev/dedicated-server/necesse-server \
-  --reuse-values
 
-# or GitHub Pages repo
+```sh
 helm upgrade --install necesse-server \
   necesse/necesse-server \
   --reuse-values
